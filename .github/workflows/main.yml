@@ -1,6 +1,7 @@
 # This is a basic workflow to help you get started with Actions
 
 name: CI
+run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 
 # Controls when the workflow will run
 on:
@@ -22,15 +23,31 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      - name: Checkout the code from the repository
+        uses: actions/checkout@v2
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+      - name: Set Up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+
+      - run: echo "🎉 Sending notification to slack channel."
+      - name: Slack Notification
+        uses: craftech-io/slack-action@v1
+        with:
+          slack_webhook_url: ""
+        if: always()
